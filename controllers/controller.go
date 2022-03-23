@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 )
 
 // Run does the running of the console application
@@ -81,7 +82,7 @@ func parseCommand(input string) {
 		views.Clear()
 		contacts := models.FindAllContacts()
 		views.PrintContactList(contacts)
-		views.EditContactInformation(contacts)
+		views.EditContactInformation()
 		responseRowIndex := askForInput()
 		models.EditContact(responseRowIndex)
 		views.EditFieldContact()
@@ -102,6 +103,7 @@ func parseCommand(input string) {
 		//
 		views.Clear()
 		views.PrintGoodbye()
+		time.Sleep(2 * time.Second)
 		views.ShutDown()
 		break
 	}
@@ -111,8 +113,8 @@ func createContact(input string) models.Contact {
 	inputFormatted := strings.ReplaceAll(input, ", ", ",")
 	elements := strings.Split(inputFormatted, ",")
 
-	if len(elements) != 5 {
-		log.Fatal("Input not as expected. 5 comma separated values needed!")
+	if len(elements) != 7 {
+		log.Fatal("Input not as expected. 7 comma separated values needed!")
 	}
 
 	// Parse contact
@@ -120,12 +122,14 @@ func createContact(input string) models.Contact {
 	name := elements[0]
 	streetName := elements[1]
 	houseNumber := elements[2]
-	phoneNumber := elements[3]
-	eMailAdress := elements[4]
+	postalCode := elements[3]
+	cityName := elements[4]
+	phoneNumber := elements[5]
+	eMailAdress := elements[6]
 
 	// Create new contact based on parsed values
 	//
-	contact := models.Contact{Name: name, StreetName: streetName, HouseNumber: houseNumber, PhoneNumber: phoneNumber, EMailAdress: eMailAdress}
+	contact := models.Contact{Name: name, StreetName: streetName, HouseNumber: houseNumber, PostalCode: postalCode, CityName: cityName, PhoneNumber: phoneNumber, EMailAdress: eMailAdress}
 
 	return contact
 }
