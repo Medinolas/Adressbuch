@@ -23,6 +23,8 @@ type Contact struct {
 	Name        string
 	StreetName  string
 	HouseNumber string
+	PostalCode  string
+	CityName    string
 	PhoneNumber string
 	EMailAdress string
 }
@@ -85,13 +87,15 @@ func parseContactData(rec []string) Contact {
 	//
 	name := rec[0]
 	streetName := rec[1]
-	houseNumber := (rec[2])
-	phoneNumber := (rec[3])
-	eMailAdress := (rec[4])
+	houseNumber := rec[2]
+	postalCode := rec[3]
+	cityName := rec[4]
+	phoneNumber := rec[5]
+	eMailAdress := rec[6]
 
 	// Create new contact based on parsed values
 	//
-	contact := Contact{Name: name, StreetName: streetName, HouseNumber: houseNumber, PhoneNumber: phoneNumber, EMailAdress: eMailAdress}
+	contact := Contact{Name: name, StreetName: streetName, HouseNumber: houseNumber, PostalCode: postalCode, CityName: cityName, PhoneNumber: phoneNumber, EMailAdress: eMailAdress}
 	return contact
 }
 
@@ -101,7 +105,7 @@ func updateDataInFile() {
 	writer := csv.NewWriter(file)
 
 	for _, contact := range contacts {
-		Contactserialized := []string{contact.Name, contact.StreetName, contact.HouseNumber, contact.PhoneNumber, contact.EMailAdress}
+		Contactserialized := []string{contact.Name, contact.StreetName, contact.HouseNumber, contact.PostalCode, contact.CityName, contact.PhoneNumber, contact.EMailAdress}
 		err := writer.Write(Contactserialized)
 		checkError("Cannot write to file", err)
 	}
@@ -129,15 +133,9 @@ func ToInt(info string) int {
 	return aInt
 }
 
-// ToBool converts a string to a boolean value
-func ToBool(info string) bool {
-	aBool, _ := strconv.ParseBool(info)
-	return aBool
-}
-
 // AddContact adds a contact to the list
 func AddContact(contact Contact) bool {
-	if contact.Name == "" || contact.StreetName == "" || contact.HouseNumber == "" || contact.PhoneNumber == "" || contact.EMailAdress == "" {
+	if contact.Name == "" || contact.StreetName == "" || contact.HouseNumber == "" || contact.PostalCode == "" || contact.CityName == "" || contact.PhoneNumber == "" || contact.EMailAdress == "" {
 		return false
 	}
 
@@ -151,11 +149,12 @@ func AddContact(contact Contact) bool {
 }
 
 // RemoveContact removes a contact from the list
-func RemoveContact(name string) {
+func RemoveContact(rowIndex string) {
 	var tempContacts []Contact
+	idAsInt := ToInt(rowIndex) - 1
 
-	for _, currentContact := range contacts {
-		if name != currentContact.Name {
+	for index, currentContact := range contacts {
+		if index != idAsInt {
 			tempContacts = append(tempContacts, currentContact)
 		}
 	}
@@ -167,7 +166,7 @@ func RemoveContact(name string) {
 	}
 }
 
-// EditContact lets you edit an information field of a contact
+// EditContact chooses the contact you want to edit
 func EditContact(i string) {
 	idAsInt := ToInt(i) - 1
 
@@ -178,6 +177,8 @@ func EditContact(i string) {
 	}
 
 }
+
+// EditFieldContact changes a field in the contact information
 func EditFieldContact(rowIndex, field, newInfo string) {
 	idAsInt := ToInt(rowIndex) - 1
 
@@ -190,6 +191,10 @@ func EditFieldContact(rowIndex, field, newInfo string) {
 				contacts[index].StreetName = newInfo
 			case field == "house number":
 				contacts[index].HouseNumber = newInfo
+			case field == "postal code":
+				contacts[index].PostalCode = newInfo
+			case field == "city name":
+				contacts[index].CityName = newInfo
 			case field == "phone number":
 				contacts[index].PhoneNumber = newInfo
 			case field == "e-mail adress":
